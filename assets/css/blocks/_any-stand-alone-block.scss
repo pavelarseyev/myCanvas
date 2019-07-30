@@ -1,0 +1,30 @@
+.main {
+    position: relative;
+    z-index: 1;
+    background-color: #313131;
+}
+
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+
+.some-content {
+    height: 100vh;
+    padding: 80px 45px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: tomato;
+    position: relative;
+
+
+}
+
+h1 {
+    color: tomato;
+}
