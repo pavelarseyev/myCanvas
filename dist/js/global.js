@@ -9685,7 +9685,6 @@ function p5training() {
         height = void 0;
     var canvas = void 0;
     var figureRect = void 0;
-    var bounding = void 0;
 
     var Point = function () {
         function Point(x, y, r, c, p) {
@@ -9702,8 +9701,8 @@ function p5training() {
             this.r = r;
             this.color = c;
             this.p = p;
-            this.maxspeed = 10;
-            this.maxforce = 0.1;
+            this.maxspeed = 20;
+            this.maxforce = 0.3;
         }
 
         _createClass(Point, [{
@@ -9776,9 +9775,9 @@ function p5training() {
             figureRect = font.textBounds("BIGDRoP", 0, 200, 192);
             var left = (width - figureRect.w) / 2;
 
-            var points = font.textToPoints("BIGDR  ", left, 200, 192, { sampleFactor: 0.3 });
-            var pointP = font.textToPoints("      P", left, 200, 192, { sampleFactor: 0.3 });
-            var pointO = font.textToPoints("     o ", left, 200, 192, { sampleFactor: 0.3 }).map(function (obj) {
+            var points = font.textToPoints("BIGDR  ", left, 200, 192, { sampleFactor: 0.5 });
+            var pointP = font.textToPoints("      P", left, 200, 192, { sampleFactor: 0.5 });
+            var pointO = font.textToPoints("     o ", left, 200, 192, { sampleFactor: 0.5 }).map(function (obj) {
                 return { alpha: obj.alpha, x: obj.x + 7, y: obj.y + 40 };
             });
 
@@ -9790,10 +9789,10 @@ function p5training() {
 
                 if (i < allPoints.length - pointO.length) {
                     color = [255, 255, 255];
-                    r = 4;
+                    r = 1;
                 } else {
                     color = [255, 255, 0];
-                    r = 8;
+                    r = 3;
                 }
 
                 allPoints[i] = new Point(allPoints[i].x, allPoints[i].y, r, color, p);

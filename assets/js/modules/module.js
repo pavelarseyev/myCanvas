@@ -95,7 +95,6 @@ export function p5training() {
     let width, height;
     let canvas;
     let figureRect;
-    let bounding;
 
     class Point {
         constructor(x, y, r, c, p) {
@@ -111,8 +110,8 @@ export function p5training() {
             this.r = r;
             this.color = c;
             this.p = p;
-            this.maxspeed = 10;
-            this.maxforce = 0.1;
+            this.maxspeed = 20;
+            this.maxforce = 0.3;
         }
 
         behaviors() {
@@ -176,9 +175,9 @@ export function p5training() {
             figureRect = font.textBounds("BIGDRoP", 0, 200, 192);
             let left = (width - figureRect.w) / 2;
 
-            let points = font.textToPoints("BIGDR  ", left, 200, 192, {sampleFactor: 0.3});
-            let pointP = font.textToPoints("      P", left, 200, 192, {sampleFactor: 0.3});
-            let pointO = font.textToPoints("     o ", left, 200, 192, {sampleFactor: 0.3}).map(function (obj) {
+            let points = font.textToPoints("BIGDR  ", left, 200, 192, {sampleFactor: 0.5});
+            let pointP = font.textToPoints("      P", left, 200, 192, {sampleFactor: 0.5});
+            let pointO = font.textToPoints("     o ", left, 200, 192, {sampleFactor: 0.5}).map(function (obj) {
                 return {alpha: obj.alpha, x: obj.x + 7, y: obj.y + 40};
             });
 
@@ -190,10 +189,10 @@ export function p5training() {
 
                 if (i < (allPoints.length - pointO.length)) {
                     color = [255, 255, 255];
-                    r = 4;
+                    r = 1;
                 } else {
                     color = [255, 255, 0];
-                    r = 8;
+                    r = 3;
                 }
 
                 allPoints[i] = new Point(allPoints[i].x, allPoints[i].y, r, color, p);
