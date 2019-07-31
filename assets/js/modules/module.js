@@ -89,8 +89,7 @@ export function p5training() {
 
     let font;
     let allPoints = [];
-    let mouseX;
-    let mouseY;
+    let secondWord = [];
     let p5 = P5;
     let width, height;
     let canvas;
@@ -110,14 +109,22 @@ export function p5training() {
             this.r = r;
             this.color = c;
             this.p = p;
-            this.maxspeed = 20;
-            this.maxforce = 0.3;
+            this.maxspeed = 10;
+            this.maxforce = 4;
         }
 
         behaviors() {
             let arrive = this.arrive(this.target);
-
             this.applyForce(arrive);
+        }
+
+        mousemovebehavior() {
+            let p = this.p;
+            let mouse = p.createVector(p.mouseX, p.mouseY);
+            let flee = this.flee(mouse);
+
+            flee.mult(35);
+            this.applyForce(flee);
         }
 
         applyForce(f) {
@@ -158,6 +165,25 @@ export function p5training() {
 
             return steer;
         }
+
+        flee(target) {
+            let desired = p5.Vector.sub(target, this.pos);
+
+            let d = desired.mag();
+
+            if (d < 100) {
+                desired.setMag(this.speed);
+                desired.mult(-1);
+
+                let steer = p5.Vector.sub(desired, this.vel);
+
+                steer.limit(this.maxforce);
+
+                return steer;
+            } else {
+                return this.p.createVector(0, 0);
+            }
+        }
     }
 
     const s = (p) => {
@@ -175,9 +201,9 @@ export function p5training() {
             figureRect = font.textBounds("BIGDRoP", 0, 200, 192);
             let left = (width - figureRect.w) / 2;
 
-            let points = font.textToPoints("BIGDR  ", left, 200, 192, {sampleFactor: 0.5});
-            let pointP = font.textToPoints("      P", left, 200, 192, {sampleFactor: 0.5});
-            let pointO = font.textToPoints("     o ", left, 200, 192, {sampleFactor: 0.5}).map(function (obj) {
+            let points = font.textToPoints("BIGDR  ", left, 200, 192, {sampleFactor: 0.7});
+            let pointP = font.textToPoints("      P", left, 200, 192, {sampleFactor: 0.7});
+            let pointO = font.textToPoints("     o ", left, 200, 192, {sampleFactor: 0.7}).map(function (obj) {
                 return {alpha: obj.alpha, x: obj.x + 7, y: obj.y + 40};
             });
 
@@ -189,36 +215,50 @@ export function p5training() {
 
                 if (i < (allPoints.length - pointO.length)) {
                     color = [255, 255, 255];
-                    r = 1;
+                    r = 3;
                 } else {
                     color = [255, 255, 0];
-                    r = 3;
+                    r = 4;
                 }
 
                 allPoints[i] = new Point(allPoints[i].x, allPoints[i].y, r, color, p);
 
             }
+
+            secondWord = font.textToPoints("BIGDEAL", left, 200, 192, {sampleFactor: 0.7});
+
+            for (let i = 0; i < secondWord.length; i++) {
+                secondWord[i] = new Point(secondWord[i].x, secondWord[i].y, 3, 255, p);
+            }
         };
 
         p.mouseMoved = () => {
-            mouseX = p.mouseX;
-            mouseY = p.mouseY;
+            for (let i = 0; i < allPoints.length; i++) {
+                allPoints[i].mousemovebehavior();
+            }
         };
 
         p.windowResized = () => {
-            p.resizeCanvas(window.innerWidth, window.innerHeight);
+            // p.resizeCanvas(window.innerWidth, window.innerHeight);
         };
 
         p.draw = () => {
             p.background(49);
 
-            // p.translate(width/2 - figureRect.w/2, 0);
-
             for (let i = 0; i < allPoints.length; i++) {
-                let v = allPoints[i];
-                v.behaviors();
-                v.update();
-                v.show();
+                allPoints[i].behaviors();
+                allPoints[i].update();
+                allPoints[i].show();
+            }
+        };
+
+        p.mouseClicked = () => {
+            for (let i = 0; i < allPoints.length; i++) {
+                if(secondWord[i].target){
+                    allPoints[i].target = secondWord[i].target;
+                }
+
+                allPoints[i].vel = p.createVector(p.random(-50, 50), p.random(0, 45));
             }
         };
     };

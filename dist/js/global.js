@@ -9628,48 +9628,48 @@ function p5training() {
     let scl = 250;
     let w = width * 4.4;
     let h = height * 6.4;
-      let flying = 0;
-      let terrain = [];
-      let s = (sk) => {
-          sk.setup = () => {
+     let flying = 0;
+     let terrain = [];
+     let s = (sk) => {
+         sk.setup = () => {
             sk.createCanvas(width, height, sk.WEBGL).parent("main");
-              cols = w / scl;
+             cols = w / scl;
             rows = h / scl;
-              for (let x = 0; x < cols; x++) {
+             for (let x = 0; x < cols; x++) {
                 terrain[x] = [];
-                  for (let y = 0; y < rows; y++) {
+                 for (let y = 0; y < rows; y++) {
                     terrain[x][y] = 0;
                 }
             }
         };
-          sk.mousePressed = () => {
-          };
-            sk.draw = () => {
+         sk.mousePressed = () => {
+         };
+          sk.draw = () => {
             flying -= 0.01;
             let yoff = -flying;
-              for (let y = 0; y < rows; y++) {
+             for (let y = 0; y < rows; y++) {
                 let xoff = flying;
-                  for (let x = 0; x < cols; x++) {
+                 for (let x = 0; x < cols; x++) {
                     terrain[x][y] = sk.map(sk.noise(xoff, yoff), 0, 1, -360, 360);
                     xoff += 0.1;
                 }
-                  yoff += 0.1;
+                 yoff += 0.1;
             }
-              sk.background(0, 0);
+             sk.background(0, 0);
             sk.translate(0, 50, -50);
             sk.rotateX(sk.PI / 3);
             sk.noStroke();
             let color = 120;
-              sk.translate(-w / 2, -h / 2);
-              for (let y = 0; y < rows; y++) {
+             sk.translate(-w / 2, -h / 2);
+             for (let y = 0; y < rows; y++) {
                 color += y;
-                  sk.fill(color);
-                  sk.beginShape(sk.TRIANGLE_STRIP);
-                  for (let x = 0; x < cols; x++) {
+                 sk.fill(color);
+                 sk.beginShape(sk.TRIANGLE_STRIP);
+                 for (let x = 0; x < cols; x++) {
                     sk.vertex(x * scl, y * scl, terrain[x][y]);
                     sk.vertex(x * scl, (y + 1) * scl, terrain[x][y + 1]);
                 }
-                  sk.endShape();
+                 sk.endShape();
             }
         };
     };*/
@@ -9678,8 +9678,7 @@ function p5training() {
 
     var font = void 0;
     var allPoints = [];
-    var mouseX = void 0;
-    var mouseY = void 0;
+    var secondWord = [];
     var p5 = __WEBPACK_IMPORTED_MODULE_1_p5_lib_p5_min__;
     var width = void 0,
         height = void 0;
@@ -9701,16 +9700,25 @@ function p5training() {
             this.r = r;
             this.color = c;
             this.p = p;
-            this.maxspeed = 20;
-            this.maxforce = 0.3;
+            this.maxspeed = 10;
+            this.maxforce = 4;
         }
 
         _createClass(Point, [{
             key: "behaviors",
             value: function behaviors() {
                 var arrive = this.arrive(this.target);
-
                 this.applyForce(arrive);
+            }
+        }, {
+            key: "mousemovebehavior",
+            value: function mousemovebehavior() {
+                var p = this.p;
+                var mouse = p.createVector(p.mouseX, p.mouseY);
+                var flee = this.flee(mouse);
+
+                flee.mult(35);
+                this.applyForce(flee);
             }
         }, {
             key: "applyForce",
@@ -9755,6 +9763,26 @@ function p5training() {
 
                 return steer;
             }
+        }, {
+            key: "flee",
+            value: function flee(target) {
+                var desired = p5.Vector.sub(target, this.pos);
+
+                var d = desired.mag();
+
+                if (d < 100) {
+                    desired.setMag(this.speed);
+                    desired.mult(-1);
+
+                    var steer = p5.Vector.sub(desired, this.vel);
+
+                    steer.limit(this.maxforce);
+
+                    return steer;
+                } else {
+                    return this.p.createVector(0, 0);
+                }
+            }
         }]);
 
         return Point;
@@ -9775,9 +9803,9 @@ function p5training() {
             figureRect = font.textBounds("BIGDRoP", 0, 200, 192);
             var left = (width - figureRect.w) / 2;
 
-            var points = font.textToPoints("BIGDR  ", left, 200, 192, { sampleFactor: 0.5 });
-            var pointP = font.textToPoints("      P", left, 200, 192, { sampleFactor: 0.5 });
-            var pointO = font.textToPoints("     o ", left, 200, 192, { sampleFactor: 0.5 }).map(function (obj) {
+            var points = font.textToPoints("BIGDR  ", left, 200, 192, { sampleFactor: 0.7 });
+            var pointP = font.textToPoints("      P", left, 200, 192, { sampleFactor: 0.7 });
+            var pointO = font.textToPoints("     o ", left, 200, 192, { sampleFactor: 0.7 }).map(function (obj) {
                 return { alpha: obj.alpha, x: obj.x + 7, y: obj.y + 40 };
             });
 
@@ -9789,35 +9817,49 @@ function p5training() {
 
                 if (i < allPoints.length - pointO.length) {
                     color = [255, 255, 255];
-                    r = 1;
+                    r = 3;
                 } else {
                     color = [255, 255, 0];
-                    r = 3;
+                    r = 4;
                 }
 
                 allPoints[i] = new Point(allPoints[i].x, allPoints[i].y, r, color, p);
             }
+
+            secondWord = font.textToPoints("BIGDEAL", left, 200, 192, { sampleFactor: 0.7 });
+
+            for (var _i = 0; _i < secondWord.length; _i++) {
+                secondWord[_i] = new Point(secondWord[_i].x, secondWord[_i].y, 3, 255, p);
+            }
         };
 
         p.mouseMoved = function () {
-            mouseX = p.mouseX;
-            mouseY = p.mouseY;
+            for (var i = 0; i < allPoints.length; i++) {
+                allPoints[i].mousemovebehavior();
+            }
         };
 
         p.windowResized = function () {
-            p.resizeCanvas(window.innerWidth, window.innerHeight);
+            // p.resizeCanvas(window.innerWidth, window.innerHeight);
         };
 
         p.draw = function () {
             p.background(49);
 
-            // p.translate(width/2 - figureRect.w/2, 0);
-
             for (var i = 0; i < allPoints.length; i++) {
-                var v = allPoints[i];
-                v.behaviors();
-                v.update();
-                v.show();
+                allPoints[i].behaviors();
+                allPoints[i].update();
+                allPoints[i].show();
+            }
+        };
+
+        p.mouseClicked = function () {
+            for (var i = 0; i < allPoints.length; i++) {
+                if (secondWord[i].target) {
+                    allPoints[i].target = secondWord[i].target;
+                }
+
+                allPoints[i].vel = p.createVector(p.random(-50, 50), p.random(0, 45));
             }
         };
     };
@@ -9829,8 +9871,8 @@ function canvas() {
     /*let a = 10;
     let b = 100;
     let time = 0;
-      let simplex = new SimplexNoise();
-      let main = document.querySelector(".main");
+     let simplex = new SimplexNoise();
+     let main = document.querySelector(".main");
     // let canvas = document.createElement("canvas");
     let canvas = document.querySelector("canvas");
     // let ctx = canvas.getContext("2d");
@@ -9840,10 +9882,10 @@ function canvas() {
     let mouseX = 0;
     let mouseY = 0;
     let scroll = 0;
-      // main.appendChild(canvas);
-      let x = 0;
+     // main.appendChild(canvas);
+     let x = 0;
     let y = 0;
-      class Walker {
+     class Walker {
         constructor(x, y, r, color, ctx, width, height, countX, countY) {
             this.x = x || 0;
             this.y = y || 0;
@@ -9857,50 +9899,50 @@ function canvas() {
             this.allow = true;
             this.particleWidth = width / countX;
             this.particleHeight = height / countY;
-              this.render = () => {
+             this.render = () => {
                 // this.color = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
                 if (this.allow) {
-                      this.walk();
+                     this.walk();
                     this.display();
-                      window.requestAnimationFrame(this.render);
+                     window.requestAnimationFrame(this.render);
                 }
             };
-              this.render();
+             this.render();
         }
-          walk() {
+         walk() {
             let number = Math.floor(randNumber(0, 100));
-              // this.path.push(this.y, this.x);
-              if (number > 0 && number <= 25) {
+             // this.path.push(this.y, this.x);
+             if (number > 0 && number <= 25) {
                 if (this.y + this.step < this.height) {
                     this.y += this.step;
                     // this.y += Math.sin(this.x) * this.step;
                     // this.x += Math.cos(this.y) * this.step;
                 }
             }
-              if (number > 25 && number <= 50) {
+             if (number > 25 && number <= 50) {
                 if (this.x - this.step >= 0) {
                     this.x -= this.step;
                     // this.x -= Math.cos(this.y) * this.step;
                     // this.y -= Math.sin(this.x) * this.step;
                 }
-              }
-              if (number > 50 && number <= 75) {
+             }
+             if (number > 50 && number <= 75) {
                 if (this.y - this.step >= 0) {
                     this.y -= this.step;
                     // this.y -= Math.sin(this.x) * this.step;
                     // this.x -= Math.cos(this.y) * this.step;
                 }
-              }
-              if (number > 75 && number <= 100) {
+             }
+             if (number > 75 && number <= 100) {
                 if (this.x + this.step < this.width) {
                     this.x += this.step;
                     // this.x += Math.sin(this.y) * this.step;
                     // this.y += Math.sin(this.x) * this.step;
                 }
             }
-          }
-          display() {
-              // this.ctx.clearRect(this.prevX - this.r - 1, this.prevY - this.r -1, this.step+2, this.step+2);
+         }
+         display() {
+             // this.ctx.clearRect(this.prevX - this.r - 1, this.prevY - this.r -1, this.step+2, this.step+2);
             this.ctx.lineWidth = 1;
             // this.ctx.strokeStyle = this.color;
             this.ctx.strokeStyle = "rgba(0,0,0, .3)";
@@ -9918,33 +9960,33 @@ function canvas() {
             this.ctx.fill();
             this.ctx.closePath();
         }
-          stop() {
+         stop() {
             this.allow = false;
         }
-          play() {
+         play() {
             this.allow = true;
             this.render();
         }
-          delete() {
-          }
+         delete() {
+         }
     }
-      class Equalizer {
+     class Equalizer {
         constructor(width, height, ctx) {
-          }
-        }
-      window.addEventListener("resize", function () {
+         }
+      }
+     window.addEventListener("resize", function () {
         setWidth(this);
     });
-      $(window).on("mousemove", function(e){
+     $(window).on("mousemove", function(e){
         mouseX = e.clientX;
         mouseY = e.clientY;
     });
-      $(window).on("scroll", function() {
+     $(window).on("scroll", function() {
         scroll = $(this).scrollTop();
     });
-      window.addEventListener("load", function () {
+     window.addEventListener("load", function () {
         setWidth(this);
-          // Walker
+         // Walker
         /!*
          *
          *
@@ -9953,69 +9995,69 @@ function canvas() {
          var myWalker;
          for (let i = 0; i < 150; i++) {
              let color = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
-              /!* let x = Math.random() * canvas.width;
+             /!* let x = Math.random() * canvas.width;
              let y = Math.random() * canvas.height;*!/
              let x = canvas.width/2;
              let y = canvas.height/2;
-               // myWalker = new Walker(x, y, 10, color, ctx, canvas.width, canvas.height);
-               console.log(myWalker);
+              // myWalker = new Walker(x, y, 10, color, ctx, canvas.width, canvas.height);
+              console.log(myWalker);
          }*!/
-          //Equalizer
+         //Equalizer
         /!*function draw(){
             ctx.clearRect(0,0,width,height);
-              ctx.beginPath();
-              for(let i = 0; i < count; i++){
+             ctx.beginPath();
+             for(let i = 0; i < count; i++){
                 // ctx.fillStyle = `rgb(${Math.random()*255},${Math.random()*55 + 128},${Math.random() * 55 + 200})`;
-                  // let value2d = simplex.noise3D(width/count * i,  time/100, time) * (0.5 - 0.001) + 0.001;
+                 // let value2d = simplex.noise3D(width/count * i,  time/100, time) * (0.5 - 0.001) + 0.001;
                 let value2d = simplex.noise3D(width/count * i, mouseX/1000, mouseY/1000); /!** (0.5 - 0.001) + 0.001*!/;
-                  let lineheight = value2d * height;
-                  ctx.fillRect(width/count * i, height / 2 - (lineheight/2), width/count*2, lineheight);
+                 let lineheight = value2d * height;
+                 ctx.fillRect(width/count * i, height / 2 - (lineheight/2), width/count*2, lineheight);
             }
             ctx.fill();
             ctx.closePath();
         }
-          function render(){
+         function render(){
             draw();
-              time += 0.001;
+             time += 0.001;
             window.requestAnimationFrame(render);
         }
-          render();*!/
-          //??
+         render();*!/
+         //??
        /!* function draw(){
             // ctx.clearRect(0,0,width,height);
-              ctx.beginPath();
-              let value2d = simplex.noise2D(mouseX/100, mouseY/100); /!** (0.5 - 0.001) + 0.001;*!/
+             ctx.beginPath();
+             let value2d = simplex.noise2D(mouseX/100, mouseY/100); /!** (0.5 - 0.001) + 0.001;*!/
             let second2d = simplex.noise2D(mouseY/100, mouseX/100); /!** (0.5 - 0.001) + 0.001;*!/
-              let lineheight = value2d * (100-20) + 20;
+             let lineheight = value2d * (100-20) + 20;
             console.log(lineheight);
-              ctx.fillRect(mouseX, mouseY, second2d, lineheight);
-              ctx.fill();
+             ctx.fillRect(mouseX, mouseY, second2d, lineheight);
+             ctx.fill();
             ctx.closePath();
         }
-          function render(){
+         function render(){
             draw();
-              time += 0.001;
+             time += 0.001;
             window.requestAnimationFrame(render);
         }*!/
-         //bg fog
+        //bg fog
         /!*let parts = 1000;
         let size = 25;
         // let x, y;
-          ctx.strokeWidth = 1;
-          function draw(){
+         ctx.strokeWidth = 1;
+         function draw(){
             ctx.clearRect(0,0,width,height);
-              for(let i = 0; i < parts; i++){
+             for(let i = 0; i < parts; i++){
                 let value = constrain(simplex.noise3D(i*time, -i*time, time/100), 0.01, 0.1);
                 ctx.fillStyle = `rgba(0,0,0, ${value})`;
                 ctx.fillRect(Math.random() * width, Math.random() * height, size, size);
             }
         }
-          function render(){
+         function render(){
             draw();
-              time += 0.01;
+             time += 0.01;
             window.requestAnimationFrame(render);
         }*!/
-            //triangled plain
+          //triangled plain
     });*/
 
     function setWidth(window) {
