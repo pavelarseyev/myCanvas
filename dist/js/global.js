@@ -9701,7 +9701,7 @@ function p5training() {
             this.color = c;
             this.p = p;
             this.maxspeed = 10;
-            this.maxforce = 4;
+            this.maxforce = 1;
         }
 
         _createClass(Point, [{
@@ -9709,6 +9709,7 @@ function p5training() {
             value: function behaviors() {
                 var arrive = this.arrive(this.target);
                 this.applyForce(arrive);
+                this.mousemovebehavior();
             }
         }, {
             key: "mousemovebehavior",
@@ -9770,7 +9771,7 @@ function p5training() {
 
                 var d = desired.mag();
 
-                if (d < 100) {
+                if (d < 50) {
                     desired.setMag(this.speed);
                     desired.mult(-1);
 
@@ -9833,11 +9834,11 @@ function p5training() {
             }
         };
 
-        p.mouseMoved = function () {
-            for (var i = 0; i < allPoints.length; i++) {
+        /*p.mouseMoved = () => {
+            for (let i = 0; i < allPoints.length; i++) {
                 allPoints[i].mousemovebehavior();
             }
-        };
+        };*/
 
         p.windowResized = function () {
             // p.resizeCanvas(window.innerWidth, window.innerHeight);
@@ -9859,7 +9860,7 @@ function p5training() {
                     allPoints[i].target = secondWord[i].target;
                 }
 
-                allPoints[i].vel = p.createVector(p.random(-50, 50), p.random(0, 45));
+                allPoints[i].vel = p.createVector(p.random(-20, 20), p.random(0, 20));
             }
         };
     };

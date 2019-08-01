@@ -110,12 +110,13 @@ export function p5training() {
             this.color = c;
             this.p = p;
             this.maxspeed = 10;
-            this.maxforce = 4;
+            this.maxforce = 1;
         }
 
         behaviors() {
             let arrive = this.arrive(this.target);
             this.applyForce(arrive);
+            this.mousemovebehavior();
         }
 
         mousemovebehavior() {
@@ -171,7 +172,7 @@ export function p5training() {
 
             let d = desired.mag();
 
-            if (d < 100) {
+            if (d < 50) {
                 desired.setMag(this.speed);
                 desired.mult(-1);
 
@@ -232,11 +233,11 @@ export function p5training() {
             }
         };
 
-        p.mouseMoved = () => {
+        /*p.mouseMoved = () => {
             for (let i = 0; i < allPoints.length; i++) {
                 allPoints[i].mousemovebehavior();
             }
-        };
+        };*/
 
         p.windowResized = () => {
             // p.resizeCanvas(window.innerWidth, window.innerHeight);
@@ -258,7 +259,7 @@ export function p5training() {
                     allPoints[i].target = secondWord[i].target;
                 }
 
-                allPoints[i].vel = p.createVector(p.random(-50, 50), p.random(0, 45));
+                allPoints[i].vel = p.createVector(p.random(-20, 20), p.random(0, 20));
             }
         };
     };
